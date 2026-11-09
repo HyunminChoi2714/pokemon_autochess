@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포켓몬 오토체스 (Pokemon Auto Chess)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Pretendard', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .game-container {
+            width: 1000px;
+            background: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .main-panel { display: flex; flex-direction: column; gap: 16px; }
+        .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Top Header */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #0f3460;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+
+        /* Board Grid */
+        .board-wrapper {
+            background: #0f3460;
+            padding: 16px;
+            border-radius: 12px;
+        }
+        .board-title { font-size: 14px; color: #e94560; margin-bottom: 8px; text-align: center; }
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            height: 400px;
+        }
+        .grid-cell {
+            background: #1a1a2e;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .grid-cell:hover { border-color: #e94560; }
+        .grid-cell.selected { border-color: #f9d56e; background: rgba(249, 213, 110, 0.2); }
+        .enemy-cell { background: #2a1b2a; border-style: solid; border-color: #532e53; }
+        .player-cell { background: #1b2a2a; border-style: solid; border-color: #2e5353; }
+        .battle-cell { border-style: solid; border-color: #333; }
+        .unit-icon { font-size: 24px; }
+        .unit-name { font-size: 11px; margin-top: 2px; }
+        .stars { color: #f9d56e; font-size: 10px; }
+
+        /* HP Bar */
+        .hp-bar-bg { width: 80%; height: 6px; background: #444; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .hp-bar-fg { height: 100%; background: #4eef90; transition: width 0.3s; }
+
+        /* Bench */
+        .bench-wrapper { background: #0f3460; padding: 12px; border-radius: 12px; }
+        .bench-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+        .bench-slot { height: 60px; background: #1a1a2e; border: 2px solid #333; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .bench-slot.selected { border-color: #f9d56e; background: rgba(249, 213, 110, 0.2); }
+
+        /* Shop & Controls */
+        .shop-wrapper { background: #0f3460; padding: 16px; border-radius: 12px; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .shop-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .shop-card { background: #1a1a2e; border: 2px solid #00fff0; border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; transition: transform 0.2s; }
+        .shop-card:hover { transform: translateY(-4px); }
+        .shop-card.disabled { border-color: #444; opacity: 0.5; cursor: not-allowed; }
+        .sold-out { font-size: 12px; color: #888; padding: 20px 0; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-reroll { background: #e94560; color: white; }
+        .btn-reroll:hover { background: #ff5773; }
+        .btn-xp { background: #0f3460; border: 1px solid #00fff0; color: white; }
+        .btn-xp:hover { background: #00fff0; color: black; }
+        .btn-battle { background: #4eef90; color: black; font-size: 16px; width: 100%; padding: 12px; }
+        .btn-battle:hover { background: #6bffab; }
+
+        /* Side Logs & Synergies */
+        .card-box { background: #0f3460; padding: 16px; border-radius: 12px; }
+        .box-title { font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #00fff0; }
+        .log-box { height: 260px; overflow-y: auto; background: #1a1a2e; padding: 10px; border-radius: 8px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
+        .log-box p { border-bottom: 1px solid #222; padding-bottom: 2px; }
+        .syn-badge { display: inline-block; background: #e94560; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 메인 게임 영역 -->
+        <div class="main-panel">
+            <div class="status-bar">
+                <div class="stat-item">❤️ HP: <span id="player-hp">100</span></div>
+                <div class="stat-item">💰 Gold: <span id="player-gold">10</span></div>
+                <div class="stat-item">⭐ Level: <span id="player-level">1</span> (<span id="player-xp">0/4</span>)</div>
+                <div class="stat-item">⚔️ Round: <span id="round-num">1</span></div>
+                <div class="stat-item">♟️ 배치: <span id="unit-count">0/1</span></div>
+            </div>
+
+            <!-- 전장 (Board) -->
+            <div class="board-wrapper">
+                <div class="board-title">▲ 적 전장 / ▼ 플레이어 전장 (포켓몬을 선택해 대기석 ↔ 전장으로 이동하세요)</div>
+                <div class="board-grid" id="board-grid"></div>
+            </div>
+
+            <!-- 대기석 (Bench) -->
+            <div class="bench-wrapper">
+                <div class="board-title">대기석 (최대 8마리)</div>
+                <div class="bench-grid" id="bench-container"></div>
+            </div>
+
+            <!-- 상점 (Shop) -->
+            <div class="shop-wrapper">
+                <div class="shop-header">
+                    <span style="font-weight: bold; color: #00fff0;">🛒 포켓몬 상점</span>
+                    <div>
+                        <button class="btn btn-xp" onclick="game.buyXp()">경험치 구매 (4G)</button>
+                        <button class="btn btn-reroll" onclick="game.rerollShop()">상점 새로고침 (2G)</button>
+                    </div>
+                </div>
+                <div class="shop-grid" id="shop-container"></div>
+            </div>
+        </div>
+
+        <!-- 사이드 패널 (시너지, 전투 버튼, 로그) -->
+        <div class="side-panel">
+            <button class="btn btn-battle" onclick="game.startBattle()">⚔️ 전투 시작!</button>
+            
+            <div class="card-box">
+                <div class="box-title">🔥 타입 시너지</div>
+                <div id="synergy-list"></div>
+            </div>
+
+            <div class="card-box" style="flex: 1; display: flex; flex-direction: column;">
+                <div class="box-title">📜 전투 / 진행 로그</div>
+                <div class="log-box" id="log-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 오토체스 게임 스크립트 연결 -->
+    <script src="pokemon_autochess.js"></script>
+</body>
+</html>
