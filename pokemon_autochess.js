@@ -1,43 +1,40 @@
 /**
  * 포켓몬 오토체스 (Pokemon Auto Chess) Core Engine & UI
- * JavaScript 단일 / 모듈형 통합 파일
  */
 
-// ==========================================
-// 1. 포켓몬 데이터베이스 (Evolution & Stats)
-// ==========================================
 const POKEMON_DB = {
-    // 불 타입 (Fire): 공격력 특화
-    '파이리': { name: '파이리', tier: 1, cost: 1, type: '불꽃', hp: 120, maxHp: 120, atk: 25, range: 1, next: '리자드', icon: '🔥' },
-    '리자드': { name: '리자드', tier: 2, cost: 3, type: '불꽃', hp: 280, maxHp: 280, atk: 55, range: 1, next: '리자몽', icon: '🔥' },
-    '리자몽': { name: '리자몽', tier: 3, cost: 9, type: '불꽃', hp: 600, maxHp: 600, atk: 120, range: 2, next: null, icon: '🐲' },
+    // 불 타입 (Fire)
+    '파이리': { id: 4, name: '파이리', tier: 1, cost: 1, type: '불꽃', hp: 120, maxHp: 120, atk: 25, range: 1, next: '리자드' },
+    '리자드': { id: 5, name: '리자드', tier: 2, cost: 3, type: '불꽃', hp: 280, maxHp: 280, atk: 55, range: 1, next: '리자몽' },
+    '리자몽': { id: 6, name: '리자몽', tier: 3, cost: 9, type: '불꽃', hp: 600, maxHp: 600, atk: 120, range: 2, next: null },
 
-    // 물 타입 (Water): 체력/방어 특화
-    '꼬부기': { name: '꼬부기', tier: 1, cost: 1, type: '물', hp: 160, maxHp: 160, atk: 15, range: 1, next: '어니부기', icon: '💧' },
-    '어니부기': { name: '어니부기', tier: 2, cost: 3, type: '물', hp: 360, maxHp: 360, atk: 35, range: 1, next: '거북왕', icon: '💧' },
-    '거북왕': { name: '거북왕', tier: 3, cost: 9, type: '물', hp: 800, maxHp: 800, atk: 75, range: 2, next: null, icon: '🐢' },
+    // 물 타입 (Water)
+    '꼬부기': { id: 7, name: '꼬부기', tier: 1, cost: 1, type: '물', hp: 160, maxHp: 160, atk: 15, range: 1, next: '어니부기' },
+    '어니부기': { id: 8, name: '어니부기', tier: 2, cost: 3, type: '물', hp: 360, maxHp: 360, atk: 35, range: 1, next: '거북왕' },
+    '거북왕': { id: 9, name: '거북왕', tier: 3, cost: 9, type: '물', hp: 800, maxHp: 800, atk: 75, range: 2, next: null },
 
-    // 풀 타입 (Grass): 사거리/지속딜
-    '이상해씨': { name: '이상해씨', tier: 1, cost: 1, type: '풀', hp: 130, maxHp: 130, atk: 18, range: 2, next: '이상해풀', icon: '🌿' },
-    '이상해풀': { name: '이상해풀', tier: 2, cost: 3, type: '풀', hp: 300, maxHp: 300, atk: 40, range: 2, next: '이상해꽃', icon: '🌿' },
-    '이상해꽃': { name: '이상해꽃', tier: 3, cost: 9, type: '풀', hp: 650, maxHp: 650, atk: 90, range: 3, next: null, icon: '🌺' },
+    // 풀 타입 (Grass)
+    '이상해씨': { id: 1, name: '이상해씨', tier: 1, cost: 1, type: '풀', hp: 130, maxHp: 130, atk: 18, range: 2, next: '이상해풀' },
+    '이상해풀': { id: 2, name: '이상해풀', tier: 2, cost: 3, type: '풀', hp: 300, maxHp: 300, atk: 40, range: 2, next: '이상해꽃' },
+    '이상해꽃': { id: 3, name: '이상해꽃', tier: 3, cost: 9, type: '풀', hp: 650, maxHp: 650, atk: 90, range: 3, next: null },
 
-    // 전기 타입 (Electric): 빠른 공격속도/높은 딜
-    '피츄': { name: '피츄', tier: 1, cost: 1, type: '전기', hp: 90, maxHp: 90, atk: 30, range: 2, next: '피카츄', icon: '⚡' },
-    '피카츄': { name: '피카츄', tier: 2, cost: 3, type: '전기', hp: 220, maxHp: 220, atk: 70, range: 2, next: '라이츄', icon: '⚡' },
-    '라이츄': { name: '라이츄', tier: 3, cost: 9, type: '전기', hp: 500, maxHp: 500, atk: 140, range: 3, next: null, icon: '⚡' },
+    // 전기 타입 (Electric)
+    '피츄': { id: 172, name: '피츄', tier: 1, cost: 1, type: '전기', hp: 90, maxHp: 90, atk: 30, range: 2, next: '피카츄' },
+    '피카츄': { id: 25, name: '피카츄', tier: 2, cost: 3, type: '전기', hp: 220, maxHp: 220, atk: 70, range: 2, next: '라이츄' },
+    '라이츄': { id: 26, name: '라이츄', tier: 3, cost: 9, type: '전기', hp: 500, maxHp: 500, atk: 140, range: 3, next: null },
 
-    // 고스트 타입 (Ghost): 기습/강한 한방
-    '고스통': { name: '고스통', tier: 1, cost: 2, type: '고스트', hp: 100, maxHp: 100, atk: 35, range: 2, next: '고우스트', icon: '👻' },
-    '고우스트': { name: '고우스트', tier: 2, cost: 4, type: '고스트', hp: 240, maxHp: 240, atk: 80, range: 2, next: '팬텀', icon: '👻' },
-    '팬텀': { name: '팬텀', tier: 3, cost: 10, type: '고스트', hp: 520, maxHp: 520, atk: 160, range: 3, next: null, icon: '👿' }
+    // 고스트 타입 (Ghost)
+    '고스통': { id: 92, name: '고스통', tier: 1, cost: 2, type: '고스트', hp: 100, maxHp: 100, atk: 35, range: 2, next: '고우스트' },
+    '고우스트': { id: 93, name: '고우스트', tier: 2, cost: 4, type: '고스트', hp: 240, maxHp: 240, atk: 80, range: 2, next: '팬텀' },
+    '팬텀': { id: 94, name: '팬텀', tier: 3, cost: 10, type: '고스트', hp: 520, maxHp: 520, atk: 160, range: 3, next: null }
 };
 
 const BASE_POKEMON_POOL = ['파이리', '꼬부기', '이상해씨', '피츄', '고스통'];
 
-// ==========================================
-// 2. 게임 상태 관리 클래스 (PokemonAutoChess)
-// ==========================================
+function getPokemonImgUrl(pokedexId) {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokedexId}.png`;
+}
+
 class PokemonAutoChess {
     constructor() {
         this.playerHp = 100;
@@ -45,16 +42,16 @@ class PokemonAutoChess {
         this.level = 1;
         this.xp = 0;
         this.round = 1;
-        this.phase = 'PREPARE'; // 'PREPARE' | 'BATTLE'
+        this.phase = 'PREPARE';
 
-        this.bench = new Array(8).fill(null); // 대기석 8칸
-        this.board = Array.from({ length: 4 }, () => new Array(4).fill(null)); // 플레이어 전장 (4x4)
-        this.enemyBoard = Array.from({ length: 4 }, () => new Array(4).fill(null)); // 적 전장 (4x4)
+        this.bench = new Array(8).fill(null);
+        this.board = Array.from({ length: 4 }, () => new Array(4).fill(null));
+        this.enemyBoard = Array.from({ length: 4 }, () => new Array(4).fill(null));
         this.shop = [];
 
-        this.selectedUnit = null; // 선택된 포켓몬 { source: 'bench'|'board', index/row, col }
+        this.selectedUnit = null;
         this.battleTimer = null;
-        this.battleUnits = []; // 전투 중 단위 객체 관리
+        this.battleUnits = [];
 
         this.init();
     }
@@ -62,15 +59,15 @@ class PokemonAutoChess {
     init() {
         this.rerollShop(true);
         this.render();
-        this.log("🎮 포켓몬 오토체스 게임에 오신 것을 환영합니다! 포켓몬을 구매하여 배치하세요.");
+        this.log("🎮 포켓몬 오토체스에 오신 것을 환영합니다! 포켓몬을 구매하고 필드에 배치하세요.");
     }
 
-    // 포켓몬 인스턴스 생성
     createPokemon(name, isEnemy = false) {
         const base = POKEMON_DB[name];
         if (!base) return null;
         return {
-            id: Math.random().toString(36).substr(2, 9),
+            uid: Math.random().toString(36).substr(2, 9),
+            pokedexId: base.id,
             name: base.name,
             tier: base.tier,
             cost: base.cost,
@@ -79,18 +76,17 @@ class PokemonAutoChess {
             maxHp: base.maxHp,
             atk: base.atk,
             range: base.range,
-            icon: base.icon,
+            img: getPokemonImgUrl(base.id),
             isEnemy: isEnemy,
-            x: 0,
-            y: 0
+            gridX: 0,
+            gridY: 0
         };
     }
 
-    // 상점 리롤
     rerollShop(free = false) {
         if (!free) {
             if (this.gold < 2) {
-                this.log("⚠️ 골드가 부족합니다! (상점 리롤에는 2골드가 필요합니다)");
+                this.log("⚠️ 골드가 부족합니다! (상점 리롤: 2골드)");
                 return;
             }
             this.gold -= 2;
@@ -103,7 +99,6 @@ class PokemonAutoChess {
         this.render();
     }
 
-    // 상점에서 구매
     buyPokemon(index) {
         if (this.phase !== 'PREPARE') return;
         const unit = this.shop[index];
@@ -125,36 +120,13 @@ class PokemonAutoChess {
         this.shop[index] = null;
         this.log(`🛒 ${unit.name}(을)를 구매하여 대기석에 배치했습니다.`);
 
-        // 3마리 진화 체크
         this.checkEvolution();
         this.render();
     }
 
-    // 포켓몬 판매
-    sellPokemon(source, idx, r, c) {
-        if (this.phase !== 'PREPARE') return;
-        let unit = null;
-        if (source === 'bench') {
-            unit = this.bench[idx];
-            this.bench[idx] = null;
-        } else if (source === 'board') {
-            unit = this.board[r][c];
-            this.board[r][c] = null;
-        }
-
-        if (unit) {
-            const refund = unit.cost;
-            this.gold += refund;
-            this.log(`💰 ${unit.name}(을)를 판매하여 ${refund} 골드를 얻었습니다.`);
-            this.render();
-        }
-    }
-
-    // 🌟 핵심 메커니즘: 3마리 포켓몬 자동 진화 (Triple Combine Evolution)
     checkEvolution() {
         let evolvedAny = false;
 
-        // 보유 중인 모든 포켓몬 수집 (대기석 + 필드)
         const counts = {};
         const collectUnits = (source, r, c, unit) => {
             if (!unit) return;
@@ -169,13 +141,11 @@ class PokemonAutoChess {
             }
         }
 
-        // 각 포켓몬 종별로 3마리 이상인지 검사
         for (const name in counts) {
             const list = counts[name];
             const nextEvoName = POKEMON_DB[name]?.next;
 
             if (list.length >= 3 && nextEvoName) {
-                // 3마리 제거 (대기석 우선 제거, 그 다음 필드)
                 const targetUnits = list.slice(0, 3);
                 let targetSlot = { source: targetUnits[0].source, r: targetUnits[0].r, c: targetUnits[0].c };
 
@@ -187,7 +157,6 @@ class PokemonAutoChess {
                     }
                 });
 
-                // 진화체 생성 및 슬롯 배치
                 const evolvedUnit = this.createPokemon(nextEvoName);
                 if (targetSlot.source === 'board') {
                     this.board[targetSlot.r][targetSlot.c] = evolvedUnit;
@@ -196,7 +165,6 @@ class PokemonAutoChess {
                     if (emptyBench !== -1) {
                         this.bench[emptyBench] = evolvedUnit;
                     } else {
-                        // 대기석 없으면 빈 필드 검색
                         let placed = false;
                         for (let r = 0; r < 4; r++) {
                             for (let c = 0; c < 4; c++) {
@@ -213,7 +181,7 @@ class PokemonAutoChess {
 
                 this.log(`✨ 3마리의 ${name}(이)가 결합하여 🌟 ${nextEvoName}(으)로 진화했습니다!`);
                 evolvedAny = true;
-                break; // 한 번 진화 후 연쇄 진화(Chain Evolution)를 위해 반복 재귀 실행
+                break;
             }
         }
 
@@ -222,7 +190,6 @@ class PokemonAutoChess {
         }
     }
 
-    // 경험치 구매 및 레벨업
     buyXp() {
         if (this.gold < 4) {
             this.log("⚠️ 골드가 부족합니다! (4골드 필요)");
@@ -233,14 +200,13 @@ class PokemonAutoChess {
         if (this.xp >= this.level * 4 && this.level < 8) {
             this.xp -= this.level * 4;
             this.level++;
-            this.log(`🎉 레벨 업! 레벨 ${this.level}에 도달했습니다. (최대 배치 가능 수: ${this.level})`);
+            this.log(`🎉 레벨 업! 레벨 ${this.level} (최대 배치 가능 수: ${this.level})`);
         } else {
-            this.log(`📘 경험치를 구매했습니다 (+4 XP).`);
+            this.log(`📘 경험치 구매 (+4 XP).`);
         }
         this.render();
     }
 
-    // 현재 배치된 포켓몬 수
     getBoardUnitCount() {
         let count = 0;
         for (let r = 0; r < 4; r++) {
@@ -251,57 +217,60 @@ class PokemonAutoChess {
         return count;
     }
 
-    // 슬롯 클릭 (이동 및 배치)
     handleSlotClick(type, r, c) {
         if (this.phase !== 'PREPARE') return;
 
         if (!this.selectedUnit) {
-            // 선택
             if (type === 'bench' && this.bench[c]) {
                 this.selectedUnit = { type: 'bench', index: c, unit: this.bench[c] };
+                this.log(`📌 대기석의 [${this.bench[c].name}] 선택됨. 배치할 위치를 클릭하세요.`);
+                this.render();
             } else if (type === 'board' && this.board[r][c]) {
                 this.selectedUnit = { type: 'board', r, c, unit: this.board[r][c] };
+                this.log(`📌 필드의 [${this.board[r][c].name}] 선택됨. 이동할 위치를 클릭하세요.`);
+                this.render();
             }
-        } else {
-            // 이동 / 위치 교체
-            const sel = this.selectedUnit;
+            return;
+        }
 
-            // 동일 슬롯 클릭 시 취소
-            if (sel.type === type && (sel.index === c || (sel.r === r && sel.c === c))) {
+        const sel = this.selectedUnit;
+
+        if (sel.type === type && (sel.index === c || (sel.r === r && sel.c === c))) {
+            this.selectedUnit = null;
+            this.render();
+            return;
+        }
+
+        if (sel.type === 'bench' && type === 'board' && !this.board[r][c]) {
+            if (this.getBoardUnitCount() >= this.level) {
+                this.log(`⚠️ 현재 레벨(${this.level})에서는 최대 ${this.level}마리까지만 필드에 배치할 수 있습니다!`);
                 this.selectedUnit = null;
                 this.render();
                 return;
             }
-
-            // 필드로 새로 배치할 때 배치 제한(Level) 검사
-            if (sel.type === 'bench' && type === 'board' && !this.board[r][c]) {
-                if (this.getBoardUnitCount() >= this.level) {
-                    this.log(`⚠️ 현재 레벨(${this.level})에서는 더 이상 포켓몬을 필드에 올릴 수 없습니다!`);
-                    this.selectedUnit = null;
-                    this.render();
-                    return;
-                }
-            }
-
-            // 슬롯 교체 실행
-            let targetUnit = null;
-            if (type === 'bench') targetUnit = this.bench[c];
-            else if (type === 'board') targetUnit = this.board[r][c];
-
-            // 출처 슬롯 세팅
-            if (sel.type === 'bench') this.bench[sel.index] = targetUnit;
-            else if (sel.type === 'board') this.board[sel.r][sel.c] = targetUnit;
-
-            // 목적지 슬롯 세팅
-            if (type === 'bench') this.bench[c] = sel.unit;
-            else if (type === 'board') this.board[r][c] = sel.unit;
-
-            this.selectedUnit = null;
-            this.render();
         }
+
+        let targetUnit = (type === 'bench') ? this.bench[c] : this.board[r][c];
+
+        if (sel.type === 'bench') {
+            this.bench[sel.index] = targetUnit;
+        } else {
+            this.board[sel.r][sel.c] = targetUnit;
+        }
+
+        if (type === 'bench') {
+            this.bench[c] = sel.unit;
+        } else {
+            this.board[r][c] = sel.unit;
+        }
+
+        this.log(`✨ 포켓몬 위치 이동 완료!`);
+        this.selectedUnit = null;
+
+        this.checkEvolution();
+        this.render();
     }
 
-    // 전투 시작
     startBattle() {
         if (this.phase !== 'PREPARE') return;
         if (this.getBoardUnitCount() === 0) {
@@ -309,38 +278,34 @@ class PokemonAutoChess {
             return;
         }
 
+        this.selectedUnit = null;
         this.phase = 'BATTLE';
-        this.log(`⚔️ Round ${this.round} 전투가 시작되었습니다!`);
+        this.log(`⚔️ Round ${this.round} 전투 시작!`);
 
-        // 적군 자동 생성
         this.generateEnemies();
 
-        // 시뮬레이션용 전투 유닛 리스트 작성
         this.battleUnits = [];
         for (let r = 0; r < 4; r++) {
             for (let c = 0; c < 4; c++) {
                 if (this.board[r][c]) {
                     const u = JSON.parse(JSON.stringify(this.board[r][c]));
                     u.gridX = c;
-                    u.gridY = r + 4; // 아군은 아래쪽 4행
+                    u.gridY = r + 4;
                     this.battleUnits.push(u);
                 }
                 if (this.enemyBoard[r][c]) {
                     const u = JSON.parse(JSON.stringify(this.enemyBoard[r][c]));
                     u.gridX = c;
-                    u.gridY = r; // 적군은 위쪽 4행
+                    u.gridY = r;
                     this.battleUnits.push(u);
                 }
             }
         }
 
         this.render();
-
-        // 1초 주기로 실시간 자동 전투 진행
         this.battleTimer = setInterval(() => this.battleStep(), 1000);
     }
 
-    // 적 생성 알고리즘
     generateEnemies() {
         this.enemyBoard = Array.from({ length: 4 }, () => new Array(4).fill(null));
         const enemyCount = Math.min(this.round, 6);
@@ -355,25 +320,21 @@ class PokemonAutoChess {
         }
     }
 
-    // 전투 한 턴 진행
     battleStep() {
         const playerUnits = this.battleUnits.filter(u => !u.isEnemy && u.hp > 0);
         const enemyUnits = this.battleUnits.filter(u => u.isEnemy && u.hp > 0);
 
-        // 승패 판단
         if (playerUnits.length === 0 || enemyUnits.length === 0) {
             this.endBattle(playerUnits.length > 0);
             return;
         }
 
-        // 각 살아있는 유닛 행동
         this.battleUnits.forEach(unit => {
             if (unit.hp <= 0) return;
 
             const targets = this.battleUnits.filter(t => t.isEnemy !== unit.isEnemy && t.hp > 0);
             if (targets.length === 0) return;
 
-            // 가장 가까운 적 찾기
             let closest = null;
             let minDist = 999;
             targets.forEach(t => {
@@ -386,11 +347,9 @@ class PokemonAutoChess {
 
             if (closest) {
                 if (minDist <= unit.range) {
-                    // 공격
                     closest.hp -= unit.atk;
-                    this.log(`💥 [${unit.name}]이(가) [${closest.name}]에게 ${unit.atk} 데미지를 입혔습니다! (남은 HP: ${Math.max(0, closest.hp)})`);
+                    this.log(`💥 [${unit.name}] -> [${closest.name}] ${unit.atk} 데미지! (남은 HP: ${Math.max(0, closest.hp)})`);
                 } else {
-                    // 이동 (적 방향으로 1칸)
                     if (unit.gridX < closest.gridX) unit.gridX++;
                     else if (unit.gridX > closest.gridX) unit.gridX--;
                     else if (unit.gridY < closest.gridY) unit.gridY++;
@@ -402,7 +361,6 @@ class PokemonAutoChess {
         this.render();
     }
 
-    // 전투 종료 처리
     endBattle(isWin) {
         clearInterval(this.battleTimer);
         this.battleTimer = null;
@@ -410,18 +368,18 @@ class PokemonAutoChess {
 
         if (isWin) {
             this.log(`🏆 Round ${this.round} 승리! +5 Gold 수령`);
-            this.gold += 5 + Math.floor(this.gold * 0.1); // 기본 5g + 이자
+            this.gold += 5 + Math.floor(this.gold * 0.1);
         } else {
             const damage = 5 + this.round;
             this.playerHp -= damage;
-            this.log(`💀 Round ${this.round} 패배! 체력이 ${damage} 감소했습니다.`);
-            this.gold += 5; // 패배 지원금
+            this.log(`💀 Round ${this.round} 패배! 체력 -${damage}`);
+            this.gold += 5;
         }
 
         if (this.playerHp <= 0) {
             this.playerHp = 0;
             this.log("☠️ 게임 오버! 체력이 0이 되었습니다.");
-            alert("게임 오버! 페이지를 새로고침하여 재기동하세요.");
+            alert("게임 오버! 새로고침하여 다시 도전하세요.");
             return;
         }
 
@@ -430,7 +388,6 @@ class PokemonAutoChess {
         this.render();
     }
 
-    // 시너지 계산 (타입별 조합 효과)
     calculateSynergies() {
         const typeCounts = {};
         for (let r = 0; r < 4; r++) {
@@ -444,7 +401,6 @@ class PokemonAutoChess {
         return typeCounts;
     }
 
-    // 로그 출력
     log(msg) {
         const logBox = document.getElementById('log-box');
         if (logBox) {
@@ -455,9 +411,7 @@ class PokemonAutoChess {
         }
     }
 
-    // UI 렌더링
     render() {
-        // 상단 정보 업데이트
         document.getElementById('player-hp').textContent = this.playerHp;
         document.getElementById('player-gold').textContent = this.gold;
         document.getElementById('player-level').textContent = this.level;
@@ -465,7 +419,6 @@ class PokemonAutoChess {
         document.getElementById('round-num').textContent = this.round;
         document.getElementById('unit-count').textContent = `${this.getBoardUnitCount()}/${this.level}`;
 
-        // 시너지 렌더링
         const synBox = document.getElementById('synergy-list');
         if (synBox) {
             const syns = this.calculateSynergies();
@@ -475,7 +428,6 @@ class PokemonAutoChess {
             }
         }
 
-        // 상점 렌더링
         const shopContainer = document.getElementById('shop-container');
         if (shopContainer) {
             shopContainer.innerHTML = '';
@@ -484,7 +436,9 @@ class PokemonAutoChess {
                 card.className = `shop-card ${!unit ? 'disabled' : ''}`;
                 if (unit) {
                     card.innerHTML = `
-                        <div class="unit-icon">${unit.icon}</div>
+                        <div class="img-wrapper">
+                            <img src="${unit.img}" alt="${unit.name}" class="pokemon-img">
+                        </div>
                         <div class="unit-name">${unit.name}</div>
                         <div class="unit-type">${unit.type}</div>
                         <div class="unit-cost">💰 ${unit.cost} G</div>
@@ -497,62 +451,82 @@ class PokemonAutoChess {
             });
         }
 
-        // 대기석(Bench) 렌더링
         const benchContainer = document.getElementById('bench-container');
         if (benchContainer) {
             benchContainer.innerHTML = '';
             this.bench.forEach((unit, idx) => {
                 const slot = document.createElement('div');
                 const isSelected = this.selectedUnit?.type === 'bench' && this.selectedUnit?.index === idx;
-                slot.className = `slot bench-slot ${isSelected ? 'selected' : ''}`;
+                slot.className = `bench-slot ${isSelected ? 'selected' : ''}`;
                 if (unit) {
                     slot.innerHTML = `
-                        <span class="icon">${unit.icon}</span>
+                        <img src="${unit.img}" class="slot-pokemon-img" alt="${unit.name}">
                         <span class="name">${unit.name}</span>
                         <span class="stars">${'★'.repeat(unit.tier)}</span>
                     `;
+                } else {
+                    slot.innerHTML = `<span class="empty-text">빈 슬롯</span>`;
                 }
                 slot.onclick = () => this.handleSlotClick('bench', null, idx);
                 benchContainer.appendChild(slot);
             });
         }
 
-        // 전장(Board) 렌더링 - 적 / 플레이어 통합 8x4 Grid
-        const boardGrid = document.getElementById('board-grid');
-        if (boardGrid) {
-            boardGrid.innerHTML = '';
+        const enemyBoardGrid = document.getElementById('enemy-board-grid');
+        const playerBoardGrid = document.getElementById('player-board-grid');
+        const battleBoardGrid = document.getElementById('battle-board-grid');
 
-            if (this.phase === 'BATTLE') {
-                // 전투 중 상태 렌더링 (8x4 grid)
-                for (let r = 0; r < 8; r++) {
-                    for (let c = 0; c < 4; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = `grid-cell battle-cell ${r < 4 ? 'enemy-area' : 'player-area'}`;
-                        const unit = this.battleUnits.find(u => u.gridY === r && u.gridX === c && u.hp > 0);
-                        if (unit) {
-                            const hpPercent = Math.max(0, Math.floor((unit.hp / unit.maxHp) * 100));
-                            cell.innerHTML = `
-                                <div class="unit-icon">${unit.icon}</div>
-                                <div class="unit-name">${unit.name}</div>
-                                <div class="hp-bar-bg"><div class="hp-bar-fg" style="width:${hpPercent}%"></div></div>
-                            `;
-                        }
-                        boardGrid.appendChild(cell);
+        const enemyArea = document.getElementById('enemy-area-wrapper');
+        const playerArea = document.getElementById('player-area-wrapper');
+        const battleArea = document.getElementById('battle-area-wrapper');
+
+        if (this.phase === 'BATTLE') {
+            enemyArea.style.display = 'none';
+            playerArea.style.display = 'none';
+            battleArea.style.display = 'block';
+
+            battleBoardGrid.innerHTML = '';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 4; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = `grid-cell battle-cell ${r < 4 ? 'enemy-side' : 'player-side'}`;
+                    const unit = this.battleUnits.find(u => u.gridY === r && u.gridX === c && u.hp > 0);
+                    if (unit) {
+                        const hpPercent = Math.max(0, Math.floor((unit.hp / unit.maxHp) * 100));
+                        cell.innerHTML = `
+                            <img src="${unit.img}" class="slot-pokemon-img" alt="${unit.name}">
+                            <div class="unit-name">${unit.name}</div>
+                            <div class="hp-bar-bg"><div class="hp-bar-fg" style="width:${hpPercent}%"></div></div>
+                        `;
                     }
+                    battleBoardGrid.appendChild(cell);
                 }
-            } else {
-                // 준비 단계 렌더링 (적전장 4x4 + 플레이어전장 4x4)
+            }
+        } else {
+            enemyArea.style.display = 'block';
+            playerArea.style.display = 'block';
+            battleArea.style.display = 'none';
+
+            if (enemyBoardGrid) {
+                enemyBoardGrid.innerHTML = '';
                 for (let r = 0; r < 4; r++) {
                     for (let c = 0; c < 4; c++) {
                         const cell = document.createElement('div');
                         cell.className = 'grid-cell enemy-cell';
                         const enemy = this.enemyBoard[r][c];
                         if (enemy) {
-                            cell.innerHTML = `<span class="icon">${enemy.icon}</span><span class="name">${enemy.name}</span>`;
+                            cell.innerHTML = `
+                                <img src="${enemy.img}" class="slot-pokemon-img" alt="${enemy.name}">
+                                <span class="name">${enemy.name}</span>
+                            `;
                         }
-                        boardGrid.appendChild(cell);
+                        enemyBoardGrid.appendChild(cell);
                     }
                 }
+            }
+
+            if (playerBoardGrid) {
+                playerBoardGrid.innerHTML = '';
                 for (let r = 0; r < 4; r++) {
                     for (let c = 0; c < 4; c++) {
                         const cell = document.createElement('div');
@@ -561,13 +535,13 @@ class PokemonAutoChess {
                         const unit = this.board[r][c];
                         if (unit) {
                             cell.innerHTML = `
-                                <span class="icon">${unit.icon}</span>
+                                <img src="${unit.img}" class="slot-pokemon-img" alt="${unit.name}">
                                 <span class="name">${unit.name}</span>
                                 <span class="stars">${'★'.repeat(unit.tier)}</span>
                             `;
                         }
                         cell.onclick = () => this.handleSlotClick('board', r, c);
-                        boardGrid.appendChild(cell);
+                        playerBoardGrid.appendChild(cell);
                     }
                 }
             }
@@ -575,7 +549,6 @@ class PokemonAutoChess {
     }
 }
 
-// 글로벌 인스턴스 초기화
 let game;
 window.onload = () => {
     game = new PokemonAutoChess();
